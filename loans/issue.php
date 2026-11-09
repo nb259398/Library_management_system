@@ -14,19 +14,25 @@ require_once "../config/database.php";
 $message = "";
 
 // Load Members
-$members = $pdo->query("SELECT * FROM members")->fetchAll(PDO::FETCH_ASSOC);
+$members = $pdo->query("SELECT * FROM members")
+               ->fetchAll(PDO::FETCH_ASSOC);
 
 // Load Books
-$books = $pdo->query("SELECT * FROM books")->fetchAll(PDO::FETCH_ASSOC);
+$books = $pdo->query("SELECT * FROM books")
+             ->fetchAll(PDO::FETCH_ASSOC);
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $member_id = $_POST['member_id'];
     $book_id = $_POST['book_id'];
 
-    // Check member
-    $memberStmt = $pdo->prepare("SELECT * FROM members WHERE member_id = ?");
+    // Check Member
+    $memberStmt = $pdo->prepare(
+        "SELECT * FROM members WHERE member_id = ?"
+    );
+
     $memberStmt->execute([$member_id]);
+
     $member = $memberStmt->fetch(PDO::FETCH_ASSOC);
 
     if ($member['status'] == 'Suspended') {
@@ -35,9 +41,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     } else {
 
-        // Check book
-        $bookStmt = $pdo->prepare("SELECT * FROM books WHERE book_id = ?");
+        // Check Book
+        $bookStmt = $pdo->prepare(
+            "SELECT * FROM books WHERE book_id = ?"
+        );
+
         $bookStmt->execute([$book_id]);
+
         $book = $bookStmt->fetch(PDO::FETCH_ASSOC);
 
         if ($book['available_copies'] <= 0) {
@@ -46,43 +56,72 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         } else {
 
-            $date_issued = date('Y-m-d');
-            $due_date = date('Y-m-d', strtotime('+14 days'));
+            // Check duplicate borrowing
 
-            // Insert Loan
-            $stmt = $pdo->prepare("
-                INSERT INTO loans
-                (
-                    member_id,
-                    book_id,
-                    user_id,
-                    date_issued,
-                    due_date,
-                    status
-                )
-                VALUES
-                (?, ?, ?, ?, ?, ?)
+            $checkLoan = $pdo->prepare("
+                SELECT *
+                FROM loans
+                WHERE member_id = ?
+                AND book_id = ?
+                AND status = 'Borrowed'
             ");
 
-            $stmt->execute([
+            $checkLoan->execute([
                 $member_id,
-                $book_id,
-                $_SESSION['user_id'],
-                $date_issued,
-                $due_date,
-                'Borrowed'
+                $book_id
             ]);
 
-            // Reduce available copies
-            $updateBook = $pdo->prepare("
-                UPDATE books
-                SET available_copies = available_copies - 1
-                WHERE book_id = ?
-            ");
+            if ($checkLoan->rowCount() > 0) {
 
-            $updateBook->execute([$book_id]);
+                $message = "This member already borrowed this book.";
 
-            $message = "Book issued successfully!";
+            } else {
+
+                $date_issued = date('Y-m-d');
+
+                $due_date = date(
+                    'Y-m-d',
+                    strtotime('+14 days')
+                );
+
+                // Insert Loan
+
+                $stmt = $pdo->prepare("
+                    INSERT INTO loans
+                    (
+                        member_id,
+                        book_id,
+                        user_id,
+                        date_issued,
+                        due_date,
+                        status
+                    )
+                    VALUES
+                    (?, ?, ?, ?, ?, ?)
+                ");
+
+                $stmt->execute([
+                    $member_id,
+                    $book_id,
+                    $_SESSION['user_id'],
+                    $date_issued,
+                    $due_date,
+                    'Borrowed'
+                ]);
+
+                // Reduce Available Copies
+
+                $updateBook = $pdo->prepare("
+                    UPDATE books
+                    SET available_copies =
+                        available_copies - 1
+                    WHERE book_id = ?
+                ");
+
+                $updateBook->execute([$book_id]);
+
+                $message = "Book issued successfully!";
+            }
         }
     }
 }
@@ -128,8 +167,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <?php foreach ($books as $book): ?>
 
             <option value="<?php echo $book['book_id']; ?>">
+
                 <?php echo $book['title']; ?>
-                (Available: <?php echo $book['available_copies']; ?>)
+
+                (Available:
+                <?php echo $book['available_copies']; ?>)
+
             </option>
 
         <?php endforeach; ?>

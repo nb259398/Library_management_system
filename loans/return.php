@@ -1,4 +1,7 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 session_start();
 
 if (!isset($_SESSION['user_id'])) {
@@ -8,23 +11,41 @@ if (!isset($_SESSION['user_id'])) {
 
 require_once "../config/database.php";
 
-if (isset($_GET['id'])) {
+// Check if loan ID exists
+if (!isset($_GET['id'])) {
 
-    $loan_id = $_GET['id'];
+    header("Location: index.php");
+    exit();
+}
 
-    $stmt = $pdo->prepare("
-        SELECT *
-        FROM loans
-        WHERE loan_id = ?
-    ");
+$loan_id = $_GET['id'];
 
-    $stmt->execute([$loan_id]);
+// Get loan details
+$stmt = $pdo->prepare("
+    SELECT *
+    FROM loans
+    WHERE loan_id = ?
+");
 
-    $loan = $stmt->fetch(PDO::FETCH_ASSOC);
+$stmt->execute([$loan_id]);
 
-    if ($loan && $loan['status'] == 'Borrowed') {
+$loan = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        // Update loan
+// Loan not found
+if (!$loan) {
+
+    die("Loan not found.");
+}
+
+// Only return borrowed books
+if ($loan['status'] == 'Borrowed') {
+
+    try {
+
+        // Start transaction
+        $pdo->beginTransaction();
+
+        // Update loan record
         $updateLoan = $pdo->prepare("
             UPDATE loans
             SET
@@ -43,6 +64,15 @@ if (isset($_GET['id'])) {
         ");
 
         $updateBook->execute([$loan['book_id']]);
+
+        // Commit transaction
+        $pdo->commit();
+
+    } catch (Exception $e) {
+
+        $pdo->rollBack();
+
+        die("Error while returning book.");
     }
 }
 
