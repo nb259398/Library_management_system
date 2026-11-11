@@ -46,66 +46,128 @@ $authors = $pdo->query("SELECT * FROM authors")->fetchAll(PDO::FETCH_ASSOC);
 $categories = $pdo->query("SELECT * FROM categories")->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Add Book</title>
-</head>
-<body>
+<?php
+$pageTitle = "Add Book";
 
-<h2>Add New Book</h2>
+if (!isset($_SESSION['full_name'])) {
+    $_SESSION['full_name'] = $_SESSION['username'] ?? 'Admin';
+}
 
-<p style="color:green;">
-    <?php echo $message; ?>
-</p>
+require_once "../includes/header.php";
+require_once "../includes/navbar.php";
+?>
 
-<form method="POST">
+<div class="container my-4">
 
-    ISBN:<br>
-    <input type="text" name="isbn" required><br><br>
+    <div class="card shadow border-0">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">📚 Add New Book</h3>
+        </div>
 
-    Title:<br>
-    <input type="text" name="title" required><br><br>
+        <div class="card-body">
 
-    Author:<br>
-    <select name="author_id" required>
-        <?php foreach($authors as $author): ?>
-            <option value="<?= $author['author_id']; ?>">
-                <?= $author['name']; ?>
-            </option>
-        <?php endforeach; ?>
-    </select>
-    <br><br>
+            <?php if (!empty($message)): ?>
+                <div class="alert alert-success">
+                    <?= htmlspecialchars($message) ?>
+                </div>
+            <?php endif; ?>
 
-    Category:<br>
-    <select name="category_id" required>
-        <?php foreach($categories as $category): ?>
-            <option value="<?= $category['category_id']; ?>">
-                <?= $category['name']; ?>
-            </option>
-        <?php endforeach; ?>
-    </select>
-    <br><br>
+            <form method="POST">
 
-    Publisher:<br>
-    <input type="text" name="publisher"><br><br>
+                <div class="mb-3">
+                    <label class="form-label">ISBN</label>
+                    <input type="text"
+                           name="isbn"
+                           class="form-control"
+                           required>
+                </div>
 
-    Year Published:<br>
-    <input type="number" name="year_published"><br><br>
+                <div class="mb-3">
+                    <label class="form-label">Title</label>
+                    <input type="text"
+                           name="title"
+                           class="form-control"
+                           required>
+                </div>
 
-    Total Copies:<br>
-    <input type="number" name="total_copies" required><br><br>
+                <div class="mb-3">
+                    <label class="form-label">Author</label>
 
-    Available Copies:<br>
-    <input type="number" name="available_copies" required><br><br>
+                    <select name="author_id"
+                            class="form-select"
+                            required>
 
-    <button type="submit">Add Book</button>
+                        <?php foreach($authors as $author): ?>
+                            <option value="<?= $author['author_id']; ?>">
+                                <?= htmlspecialchars($author['name']); ?>
+                            </option>
+                        <?php endforeach; ?>
 
-</form>
+                    </select>
+                </div>
 
-<br>
+                <div class="mb-3">
+                    <label class="form-label">Category</label>
 
-<a href="index.php">Back to Books List</a>
+                    <select name="category_id"
+                            class="form-select"
+                            required>
 
-</body>
-</html>
+                        <?php foreach($categories as $category): ?>
+                            <option value="<?= $category['category_id']; ?>">
+                                <?= htmlspecialchars($category['name']); ?>
+                            </option>
+                        <?php endforeach; ?>
+
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Publisher</label>
+                    <input type="text"
+                           name="publisher"
+                           class="form-control">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Year Published</label>
+                    <input type="number"
+                           name="year_published"
+                           class="form-control">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Total Copies</label>
+                    <input type="number"
+                           name="total_copies"
+                           class="form-control"
+                           required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Available Copies</label>
+                    <input type="number"
+                           name="available_copies"
+                           class="form-control"
+                           required>
+                </div>
+
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary">
+                        💾 Save Book
+                    </button>
+
+                    <a href="index.php"
+                       class="btn btn-secondary">
+                        ← Back
+                    </a>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+</div>
+
+<?php require_once "../includes/footer.php"; ?>

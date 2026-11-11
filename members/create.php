@@ -38,59 +38,100 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 ?>
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Add Member</title>
-</head>
-<body>
+<?php
+$pageTitle = "Add Member";
 
-<h2>Add New Member</h2>
+if (!isset($_SESSION['full_name'])) {
+    $_SESSION['full_name'] = $_SESSION['username'] ?? 'Admin';
+}
 
-<p style="color:green;">
-    <?php echo $message; ?>
-</p>
+require_once "../includes/header.php";
+require_once "../includes/navbar.php";
+?>
 
-<form method="POST">
+<div class="container my-4">
 
-    Member Number:<br>
-    <input type="text" name="member_number" required>
-    <br><br>
+    <div class="card shadow border-0">
+        <div class="card-header bg-success text-white">
+            <h3 class="mb-0">👥 Add New Member</h3>
+        </div>
 
-    Full Name:<br>
-    <input type="text" name="full_name" required>
-    <br><br>
+        <div class="card-body">
 
-    Email:<br>
-    <input type="email" name="email" required>
-    <br><br>
+            <?php if (!empty($message)): ?>
+                <div class="alert alert-success">
+                    <?= htmlspecialchars($message) ?>
+                </div>
+            <?php endif; ?>
 
-    Phone:<br>
-    <input type="text" name="phone" required>
-    <br><br>
+            <form method="POST">
 
-    Status:<br>
-    <select name="status">
-        <option value="Active">Active</option>
-        <option value="Suspended">Suspended</option>
-    </select>
-    <br><br>
+                <div class="mb-3">
+                    <label class="form-label">Member Number</label>
+                    <input type="text"
+                           name="member_number"
+                           class="form-control"
+                           required>
+                </div>
 
-    Date Joined:<br>
-    <input type="date" name="date_joined" required>
-    <br><br>
+                <div class="mb-3">
+                    <label class="form-label">Full Name</label>
+                    <input type="text"
+                           name="full_name"
+                           class="form-control"
+                           required>
+                </div>
 
-    <button type="submit">
-        Add Member
-    </button>
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input type="email"
+                           name="email"
+                           class="form-control"
+                           required>
+                </div>
 
-</form>
+                <div class="mb-3">
+                    <label class="form-label">Phone</label>
+                    <input type="text"
+                           name="phone"
+                           class="form-control"
+                           required>
+                </div>
 
-<br>
+                <div class="mb-3">
+                    <label class="form-label">Status</label>
 
-<a href="index.php">
-    Back to Members List
-</a>
+                    <select name="status" class="form-select">
+                        <option value="Active">Active</option>
+                        <option value="Suspended">Suspended</option>
+                    </select>
+                </div>
 
-</body>
-</html>
+                <div class="mb-3">
+                    <label class="form-label">Date Joined</label>
+                    <input type="date"
+                           name="date_joined"
+                           class="form-control"
+                           required>
+                </div>
+
+                <div class="mt-4">
+
+                    <button type="submit" class="btn btn-success">
+                        💾 Save Member
+                    </button>
+
+                    <a href="index.php" class="btn btn-secondary">
+                        ← Back
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+</div>
+
+<?php require_once "../includes/footer.php"; ?>

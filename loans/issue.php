@@ -127,71 +127,112 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 ?>
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Issue Book</title>
-</head>
-<body>
+<?php
+$pageTitle = "Issue Book";
 
-<h2>Issue Book</h2>
+if (!isset($_SESSION['full_name'])) {
+    $_SESSION['full_name'] = $_SESSION['username'] ?? 'Admin';
+}
 
-<p style="color:green;">
-    <?php echo $message; ?>
-</p>
+require_once "../includes/header.php";
+require_once "../includes/navbar.php";
+?>
 
-<form method="POST">
+<div class="container my-4">
 
-    <label>Member</label>
-    <br>
+    <div class="card shadow border-0">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">📚 Issue Book</h3>
+        </div>
 
-    <select name="member_id" required>
+        <div class="card-body">
 
-        <?php foreach ($members as $member): ?>
+            <?php if (!empty($message)): ?>
 
-            <option value="<?php echo $member['member_id']; ?>">
-                <?php echo $member['full_name']; ?>
-            </option>
+                <?php if (
+                    $message == "Book issued successfully!"
+                ): ?>
 
-        <?php endforeach; ?>
+                    <div class="alert alert-success">
+                        <?= htmlspecialchars($message) ?>
+                    </div>
 
-    </select>
+                <?php else: ?>
 
-    <br><br>
+                    <div class="alert alert-danger">
+                        <?= htmlspecialchars($message) ?>
+                    </div>
 
-    <label>Book</label>
-    <br>
+                <?php endif; ?>
 
-    <select name="book_id" required>
+            <?php endif; ?>
 
-        <?php foreach ($books as $book): ?>
+            <form method="POST">
 
-            <option value="<?php echo $book['book_id']; ?>">
+                <div class="mb-3">
+                    <label class="form-label">
+                        Select Member
+                    </label>
 
-                <?php echo $book['title']; ?>
+                    <select name="member_id"
+                            class="form-select"
+                            required>
 
-                (Available:
-                <?php echo $book['available_copies']; ?>)
+                        <?php foreach ($members as $member): ?>
 
-            </option>
+                            <option value="<?= $member['member_id']; ?>">
+                                <?= htmlspecialchars($member['full_name']); ?>
+                            </option>
 
-        <?php endforeach; ?>
+                        <?php endforeach; ?>
 
-    </select>
+                    </select>
+                </div>
 
-    <br><br>
+                <div class="mb-3">
+                    <label class="form-label">
+                        Select Book
+                    </label>
 
-    <button type="submit">
-        Issue Book
-    </button>
+                    <select name="book_id"
+                            class="form-select"
+                            required>
 
-</form>
+                        <?php foreach ($books as $book): ?>
 
-<br><br>
+                            <option value="<?= $book['book_id']; ?>">
 
-<a href="index.php">
-    Back to Loans
-</a>
+                                <?= htmlspecialchars($book['title']); ?>
 
-</body>
-</html>
+                                (Available:
+                                <?= $book['available_copies']; ?>)
+
+                            </option>
+
+                        <?php endforeach; ?>
+
+                    </select>
+                </div>
+
+                <div class="mt-4">
+
+                    <button type="submit"
+                            class="btn btn-primary">
+                        📖 Issue Book
+                    </button>
+
+                    <a href="index.php"
+                       class="btn btn-secondary">
+                        ← Back
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+</div>
+
+<?php require_once "../includes/footer.php"; ?>

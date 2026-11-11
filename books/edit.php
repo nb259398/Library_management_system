@@ -67,96 +67,102 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 ?>
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Edit Book</title>
-</head>
-<body>
+<?php
+$pageTitle = "Edit Book";
 
-<h2>Edit Book</h2>
+if (!isset($_SESSION['full_name'])) {
+    $_SESSION['full_name'] = $_SESSION['username'] ?? 'Admin';
+}
 
-<p style="color:green;">
-    <?php echo $message; ?>
-</p>
+require_once "../includes/header.php";
+require_once "../includes/navbar.php";
+?>
 
-<form method="POST">
+<div class="container my-4">
 
-    ISBN:<br>
-    <input type="text" name="isbn"
-           value="<?php echo $book['isbn']; ?>" required>
-    <br><br>
+    <div class="card shadow border-0">
+        <div class="card-header bg-warning text-dark">
+            <h3 class="mb-0">✏️ Edit Book</h3>
+        </div>
 
-    Title:<br>
-    <input type="text" name="title"
-           value="<?php echo $book['title']; ?>" required>
-    <br><br>
+        <div class="card-body">
 
-    Author:<br>
-    <select name="author_id">
+            <?php if (!empty($message)): ?>
+                <div class="alert alert-success">
+                    <?= htmlspecialchars($message) ?>
+                </div>
+            <?php endif; ?>
 
-        <?php foreach($authors as $author): ?>
+            <form method="POST">
 
-        <option value="<?php echo $author['author_id']; ?>"
-        <?php
-            if($author['author_id'] == $book['author_id']){
-                echo "selected";
-            }
-        ?>>
-            <?php echo $author['name']; ?>
-        </option>
+                <div class="mb-3">
+                    <label class="form-label">ISBN</label>
+                    <input type="text"
+                           name="isbn"
+                           class="form-control"
+                           value="<?= htmlspecialchars($book['isbn']) ?>"
+                           required>
+                </div>
 
-        <?php endforeach; ?>
+                <div class="mb-3">
+                    <label class="form-label">Title</label>
+                    <input type="text"
+                           name="title"
+                           class="form-control"
+                           value="<?= htmlspecialchars($book['title']) ?>"
+                           required>
+                </div>
 
-    </select>
-    <br><br>
+                <div class="mb-3">
+                    <label class="form-label">Author</label>
 
-    Category:<br>
-    <select name="category_id">
+                    <select name="author_id" class="form-select">
 
-        <?php foreach($categories as $category): ?>
+                        <?php foreach($authors as $author): ?>
+                            <option value="<?= $author['author_id']; ?>"
+                                <?= ($author['author_id'] == $book['author_id']) ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($author['name']); ?>
+                            </option>
+                        <?php endforeach; ?>
 
-        <option value="<?php echo $category['category_id']; ?>"
-        <?php
-            if($category['category_id'] == $book['category_id']){
-                echo "selected";
-            }
-        ?>>
-            <?php echo $category['name']; ?>
-        </option>
+                    </select>
+                </div>
 
-        <?php endforeach; ?>
+                <div class="mb-3">
+                    <label class="form-label">Category</label>
 
-    </select>
-    <br><br>
+                    <select name="category_id" class="form-select">
 
-    Publisher:<br>
-    <input type="text" name="publisher"
-           value="<?php echo $book['publisher']; ?>">
-    <br><br>
+                        <?php foreach($categories as $category): ?>
+                            <option value="<?= $category['category_id']; ?>"
+                                <?= ($category['category_id'] == $book['category_id']) ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($category['name']); ?>
+                            </option>
+                        <?php endforeach; ?>
 
-    Year Published:<br>
-    <input type="number" name="year_published"
-           value="<?php echo $book['year_published']; ?>">
-    <br><br>
+                    </select>
+                </div>
 
-    Total Copies:<br>
-    <input type="number" name="total_copies"
-           value="<?php echo $book['total_copies']; ?>">
-    <br><br>
+                <div class="mb-3">
+                    <label class="form-label">Publisher</label>
+                    <input type="text"
+                           name="publisher"
+                           class="form-control"
+                           value="<?= htmlspecialchars($book['publisher']) ?>">
+                </div>
 
-    Available Copies:<br>
-    <input type="number" name="available_copies"
-           value="<?php echo $book['available_copies']; ?>">
-    <br><br>
+                <div class="mb-3">
+                    <label class="form-label">Year Published</label>
+                    <input type="number"
+                           name="year_published"
+                           class="form-control"
+                           value="<?= htmlspecialchars($book['year_published']) ?>">
+                </div>
 
-    <button type="submit">Update Book</button>
-
-</form>
-
-<br>
-
-<a href="index.php">Back to Books List</a>
-
-</body>
-</html>
+                <div class="mb-3">
+                    <label class="form-label">Total Copies</label>
+                    <input type="number"
+                           name="total_copies"
+                           class="form-control"
+                           value="<?= htmlspecialchars($book['total_copies']) ?>">
+            

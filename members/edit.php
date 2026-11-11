@@ -54,71 +54,114 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 ?>
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Edit Member</title>
-</head>
-<body>
+<?php
+$pageTitle = "Edit Member";
 
-<h2>Edit Member</h2>
+if (!isset($_SESSION['full_name'])) {
+    $_SESSION['full_name'] = $_SESSION['username'] ?? 'Admin';
+}
 
-<p style="color:green;">
-    <?php echo $message; ?>
-</p>
+require_once "../includes/header.php";
+require_once "../includes/navbar.php";
+?>
 
-<form method="POST">
+<div class="container my-4">
 
-    Member Number:<br>
-    <input type="text" name="member_number"
-    value="<?php echo $member['member_number']; ?>" required>
-    <br><br>
+    <div class="card shadow border-0">
+        <div class="card-header bg-warning text-dark">
+            <h3 class="mb-0">✏️ Edit Member</h3>
+        </div>
 
-    Full Name:<br>
-    <input type="text" name="full_name"
-    value="<?php echo $member['full_name']; ?>" required>
-    <br><br>
+        <div class="card-body">
 
-    Email:<br>
-    <input type="email" name="email"
-    value="<?php echo $member['email']; ?>" required>
-    <br><br>
+            <?php if (!empty($message)): ?>
+                <div class="alert alert-success">
+                    <?= htmlspecialchars($message) ?>
+                </div>
+            <?php endif; ?>
 
-    Phone:<br>
-    <input type="text" name="phone"
-    value="<?php echo $member['phone']; ?>" required>
-    <br><br>
+            <form method="POST">
 
-    Status:<br>
-    <select name="status">
-        <option value="Active"
-        <?php if($member['status']=="Active") echo "selected"; ?>>
-        Active
-        </option>
+                <div class="mb-3">
+                    <label class="form-label">Member Number</label>
+                    <input type="text"
+                           name="member_number"
+                           class="form-control"
+                           value="<?= htmlspecialchars($member['member_number']) ?>"
+                           required>
+                </div>
 
-        <option value="Suspended"
-        <?php if($member['status']=="Suspended") echo "selected"; ?>>
-        Suspended
-        </option>
-    </select>
+                <div class="mb-3">
+                    <label class="form-label">Full Name</label>
+                    <input type="text"
+                           name="full_name"
+                           class="form-control"
+                           value="<?= htmlspecialchars($member['full_name']) ?>"
+                           required>
+                </div>
 
-    <br><br>
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input type="email"
+                           name="email"
+                           class="form-control"
+                           value="<?= htmlspecialchars($member['email']) ?>"
+                           required>
+                </div>
 
-    Date Joined:<br>
-    <input type="date" name="date_joined"
-    value="<?php echo $member['date_joined']; ?>" required>
+                <div class="mb-3">
+                    <label class="form-label">Phone</label>
+                    <input type="text"
+                           name="phone"
+                           class="form-control"
+                           value="<?= htmlspecialchars($member['phone']) ?>"
+                           required>
+                </div>
 
-    <br><br>
+                <div class="mb-3">
+                    <label class="form-label">Status</label>
 
-    <button type="submit">
-        Update Member
-    </button>
+                    <select name="status" class="form-select">
 
-</form>
+                        <option value="Active"
+                            <?= ($member['status'] == 'Active') ? 'selected' : '' ?>>
+                            Active
+                        </option>
 
-<br>
+                        <option value="Suspended"
+                            <?= ($member['status'] == 'Suspended') ? 'selected' : '' ?>>
+                            Suspended
+                        </option>
 
-<a href="index.php">Back to Members List</a>
+                    </select>
+                </div>
 
-</body>
-</html>
+                <div class="mb-3">
+                    <label class="form-label">Date Joined</label>
+                    <input type="date"
+                           name="date_joined"
+                           class="form-control"
+                           value="<?= htmlspecialchars($member['date_joined']) ?>"
+                           required>
+                </div>
+
+                <div class="mt-4">
+
+                    <button type="submit" class="btn btn-warning">
+                        💾 Update Member
+                    </button>
+
+                    <a href="index.php" class="btn btn-secondary">
+                        ← Back
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+</div>
+
+<?php require_once "../includes/footer.php"; ?>

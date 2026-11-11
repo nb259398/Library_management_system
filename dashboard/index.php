@@ -8,201 +8,134 @@ if (!isset($_SESSION['user_id'])) {
 
 require_once "../config/database.php";
 
+$username = $_SESSION['username'] ?? 'Admin';
+
+if (!isset($_SESSION['full_name'])) {
+    $_SESSION['full_name'] = $username;
+}
+
 // Statistics
+$totalBooks = $pdo->query("SELECT COUNT(*) FROM books")->fetchColumn() ?? 0;
 
-$totalBooks = $pdo->query("
-    SELECT COUNT(*) FROM books
-")->fetchColumn();
-
-$totalMembers = $pdo->query("
-    SELECT COUNT(*) FROM members
-")->fetchColumn();
+$totalMembers = $pdo->query("SELECT COUNT(*) FROM members")->fetchColumn() ?? 0;
 
 $borrowedBooks = $pdo->query("
-    SELECT COUNT(*) FROM loans
+    SELECT COUNT(*)
+    FROM loans
     WHERE status='Borrowed'
-")->fetchColumn();
+")->fetchColumn() ?? 0;
 
 $returnedBooks = $pdo->query("
-    SELECT COUNT(*) FROM loans
+    SELECT COUNT(*)
+    FROM loans
     WHERE status='Returned'
-")->fetchColumn();
+")->fetchColumn() ?? 0;
 
 $suspendedMembers = $pdo->query("
-    SELECT COUNT(*) FROM members
+    SELECT COUNT(*)
+    FROM members
     WHERE status='Suspended'
-")->fetchColumn();
+")->fetchColumn() ?? 0;
 
 $availableBooks = $pdo->query("
-    SELECT SUM(available_copies)
+    SELECT COALESCE(SUM(available_copies),0)
     FROM books
 ")->fetchColumn();
-
 ?>
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Dashboard</title>
+<?php
+$pageTitle = "Dashboard";
+require_once "../includes/header.php";
+require_once "../includes/navbar.php";
+?>
 
-    <style>
+<div class="container my-4">
 
-        *{
-            margin:0;
-            padding:0;
-            box-sizing:border-box;
-            font-family:Arial, sans-serif;
-        }
+    <h1 class="mb-4">📚 Library Management System Dashboard</h1>
 
-        body{
-            background:#f4f6f9;
-            padding:40px;
-        }
+    <p class="lead">
+        Welcome,
+        <strong><?= htmlspecialchars($username) ?></strong>
+    </p>
 
-        h1{
-            margin-bottom:10px;
-            color:#333;
-        }
+    <div class="row g-4">
 
-        .welcome{
-            margin-bottom:30px;
-            font-size:18px;
-        }
+        <div class="col-md-4">
+            <div class="card bg-primary text-white shadow">
+                <div class="card-body text-center">
+                    <h5>Total Books</h5>
+                    <h1><?= $totalBooks ?></h1>
+                </div>
+            </div>
+        </div>
 
-        .card-container{
-            display:flex;
-            flex-wrap:wrap;
-            gap:20px;
-            margin-bottom:40px;
-        }
+        <div class="col-md-4">
+            <div class="card bg-success text-white shadow">
+                <div class="card-body text-center">
+                    <h5>Total Members</h5>
+                    <h1><?= $totalMembers ?></h1>
+                </div>
+            </div>
+        </div>
 
-        .card{
-            flex:1;
-            min-width:250px;
-            padding:25px;
-            border-radius:15px;
-            color:white;
-            box-shadow:0 5px 15px rgba(0,0,0,0.2);
-        }
+        <div class="col-md-4">
+            <div class="card bg-warning text-white shadow">
+                <div class="card-body text-center">
+                    <h5>Books On Loan</h5>
+                    <h1><?= $borrowedBooks ?></h1>
+                </div>
+            </div>
+        </div>
 
-        .blue{
-            background:linear-gradient(135deg,#007bff,#00c6ff);
-        }
+        <div class="col-md-4">
+            <div class="card bg-info text-white shadow">
+                <div class="card-body text-center">
+                    <h5>Returned Books</h5>
+                    <h1><?= $returnedBooks ?></h1>
+                </div>
+            </div>
+        </div>
 
-        .green{
-            background:linear-gradient(135deg,#28a745,#6bd66b);
-        }
+        <div class="col-md-4">
+            <div class="card bg-danger text-white shadow">
+                <div class="card-body text-center">
+                    <h5>Suspended Members</h5>
+                    <h1><?= $suspendedMembers ?></h1>
+                </div>
+            </div>
+        </div>
 
-        .orange{
-            background:linear-gradient(135deg,#ff9800,#ffcc80);
-        }
+        <div class="col-md-4">
+            <div class="card bg-dark text-white shadow">
+                <div class="card-body text-center">
+                    <h5>Available Copies</h5>
+                    <h1><?= $availableBooks ?></h1>
+                </div>
+            </div>
+        </div>
 
-        .purple{
-            background:linear-gradient(135deg,#6f42c1,#b388ff);
-        }
-
-        .red{
-            background:linear-gradient(135deg,#dc3545,#ff7b89);
-        }
-
-        .dark{
-            background:linear-gradient(135deg,#343a40,#6c757d);
-        }
-
-        .card h2{
-            font-size:24px;
-            margin-bottom:15px;
-        }
-
-        .card p{
-            font-size:40px;
-            font-weight:bold;
-        }
-
-        .menu{
-            margin-top:20px;
-        }
-
-        .menu a{
-            display:inline-block;
-            text-decoration:none;
-            color:white;
-            background:#007bff;
-            padding:12px 20px;
-            margin:8px;
-            border-radius:8px;
-            font-weight:bold;
-        }
-
-        .menu a:hover{
-            background:#0056b3;
-        }
-
-    </style>
-
-</head>
-<body>
-
-<h1>📚 Library Management System Dashboard</h1>
-
-<p class="welcome">
-    Welcome,
-    <strong><?php echo $_SESSION['username']; ?></strong>
-</p>
-
-<div class="card-container">
-
-    <div class="card blue">
-        <h2>Total Books</h2>
-        <p><?php echo $totalBooks; ?></p>
     </div>
 
-    <div class="card green">
-        <h2>Total Members</h2>
-        <p><?php echo $totalMembers; ?></p>
-    </div>
+    <div class="mt-5">
 
-    <div class="card orange">
-        <h2>Books On Loan</h2>
-        <p><?php echo $borrowedBooks; ?></p>
-    </div>
+        <a href="../books/index.php" class="btn btn-primary">
+            📖 Manage Books
+        </a>
 
-    <div class="card purple">
-        <h2>Returned Books</h2>
-        <p><?php echo $returnedBooks; ?></p>
-    </div>
+        <a href="../members/index.php" class="btn btn-success">
+            👥 Manage Members
+        </a>
 
-    <div class="card red">
-        <h2>Suspended Members</h2>
-        <p><?php echo $suspendedMembers; ?></p>
-    </div>
+        <a href="../loans/index.php" class="btn btn-warning">
+            🔄 Manage Loans
+        </a>
 
-    <div class="card dark">
-        <h2>Available Copies</h2>
-        <p><?php echo $availableBooks; ?></p>
+        <a href="../auth/logout.php" class="btn btn-danger">
+            🚪 Logout
+        </a>
+
     </div>
 
 </div>
 
-<div class="menu">
-
-    <a href="../books/index.php">
-        📖 Manage Books
-    </a>
-
-    <a href="../members/index.php">
-        👥 Manage Members
-    </a>
-
-    <a href="../loans/index.php">
-        🔄 Manage Loans
-    </a>
-
-    <a href="../auth/logout.php">
-        🚪 Logout
-    </a>
-
-</div>
-
-</body>
-</html>
+<?php require_once "../includes/footer.php"; ?>
