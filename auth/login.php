@@ -34,32 +34,118 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $message = "User not found.";
     }
 }
+
+$pageTitle = "Login";
+require_once "../includes/header.php";
 ?>
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Library Login</title>
-</head>
-<body>
+<style>
+.login-wrapper{
+    min-height:85vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
 
-<h2>Library Management System Login</h2>
+.login-card{
+    width:100%;
+    max-width:450px;
+    border:none;
+    border-radius:20px;
+    overflow:hidden;
+}
 
-<form method="POST">
+.login-header{
+    background:linear-gradient(135deg,#0d6efd,#0a58ca);
+    color:white;
+    padding:30px;
+    text-align:center;
+}
 
-    <label>Username</label><br>
-    <input type="text" name="username" required><br><br>
+.login-header h2{
+    margin:0;
+    font-weight:700;
+}
 
-    <label>Password</label><br>
-    <input type="password" name="password" required><br><br>
+.login-body{
+    padding:30px;
+}
 
-    <button type="submit">Login</button>
+.form-control{
+    border-radius:10px;
+    padding:12px;
+}
 
-</form>
+.btn-login{
+    border-radius:10px;
+    padding:12px;
+    font-weight:600;
+}
 
-<p style="color:red;">
-    <?php echo $message; ?>
-</p>
+.library-icon{
+    font-size:50px;
+    margin-bottom:10px;
+}
+</style>
 
-</body>
-</html>
+<div class="container login-wrapper">
+
+    <div class="card shadow-lg login-card">
+
+        <div class="login-header">
+            <div class="library-icon">📚</div>
+            <h2>Library Management System</h2>
+            <p class="mb-0">Librarian Login Portal</p>
+        </div>
+
+        <div class="login-body">
+
+            <?php if (!empty($message)): ?>
+                <div class="alert alert-danger">
+                    <?= htmlspecialchars($message) ?>
+                </div>
+            <?php endif; ?>
+
+            <form method="POST">
+
+                <div class="mb-3">
+                    <label class="form-label">
+                        Username
+                    </label>
+
+                    <input
+                        type="text"
+                        name="username"
+                        class="form-control"
+                        placeholder="Enter username"
+                        required>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">
+                        Password
+                    </label>
+
+                    <input
+                        type="password"
+                        name="password"
+                        class="form-control"
+                        placeholder="Enter password"
+                        required>
+                </div>
+
+                <button
+                    type="submit"
+                    class="btn btn-primary w-100 btn-login">
+                    Login
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+<?php require_once "../includes/footer.php"; ?>
